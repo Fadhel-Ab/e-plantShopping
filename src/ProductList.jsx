@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
+import { addItem } from './CartSlice';
+import { useDispatch } from 'react-redux';
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-
+    const [addedToCart, setAddedToCart]=useState({});
+    const dispatch=useDispatch();
     const plantsArray = [
         {
             category: "Air Purifying Plants",
@@ -218,7 +221,7 @@ function ProductList({ onHomeClick }) {
         padding: '15px',
         display: 'flex',
         justifyContent: 'space-between',
-        alignIems: 'center',
+        alignItems: 'center',
         fontSize: '20px',
     }
     const styleObjUl = {
@@ -231,6 +234,7 @@ function ProductList({ onHomeClick }) {
         color: 'white',
         fontSize: '30px',
         textDecoration: 'none',
+        margin: '130px',
     }
 
     const handleHomeClick = (e) => {
@@ -252,9 +256,17 @@ function ProductList({ onHomeClick }) {
         e.preventDefault();
         setShowCart(false);
     };
+
+    const handleAddToCart = (item)=>{
+     dispatch(addItem(item));
+     setAddedToCart(prevItems=>({
+        ...prevItems,
+        [item.name]:true,
+     }));
+    };
     return (
         <div>
-            <div className="navbar" style={styleObj}>
+            <div className="navbar" >
                 <div className="tag">
                     <div className="luxury">
                         <img src="https://cdn.pixabay.com/photo/2020/08/05/13/12/eco-5465432_1280.png" alt="" />
@@ -274,7 +286,21 @@ function ProductList({ onHomeClick }) {
             </div>
             {!showCart ? (
                 <div className="product-grid">
-
+                    {plantsArray.map((category, index) => (
+                        <div key={index}>
+                            <h1><div style={{textAlign:'center'}}>{category.category}</div></h1>
+                            <div className='product-list'>
+                                {category.plants.map((plant, PlantIndex) => (
+                                    <div key={PlantIndex} className='product-card'>
+                                        <div className='product-title'>{plant.name}</div>
+                                        <img className='product-image' src={plant.image} alt={plant.name} />                              
+                                        <div className='product-cost'>{plant.cost}</div>
+                                        <button className='product-button' onClick={() => handleAddToCart(plant)}>Add to Cart</button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
 
                 </div>
             ) : (
